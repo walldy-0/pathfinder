@@ -1,3 +1,26 @@
+$cell-size: 40px;
+$border: 1px solid black;
+
 *, *::before, *::after {
   box-sizing: border-box;
 }
+
+table {
+  border: $border;
+
+  td {
+    border: $border;
+    width: $cell-size;
+    height: $cell-size;
+    text-align: center;
+
+    &:hover {
+      background-color: green;
+    }
+  }
+}
+
+.selected {
+  background-color: red;
+}
+
