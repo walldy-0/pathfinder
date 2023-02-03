@@ -38,8 +38,57 @@ class Pathfinder {
 
     return foundEquals;
   }
+
+  isLineConnectionForAllSquares(pathToCheck) {
+    const thisPathfinder = this;
+
+    // no need to check a single square, it isn't connector between other squares
+    if (pathToCheck.length <= 1) {
+      return true;
+    }
+
+    // create copy of pathToCheck (in case of using it outside this method)
+    const path = pathToCheck.slice();
+    
+    const connectedSquares = [];
+    let allConnected = true;
+
+    // move first square to connected squares path as connected
+    thisPathfinder.moveSquare(path, connectedSquares, path[0]);
+
+    // remove connected squares from path until exhaustion path array,
+    while (path.length > 0) {
+      const foundedConnectedSquare = thisPathfinder.findConnection(connectedSquares, path);
+      if (!foundedConnectedSquare) {
+
+        console.log('not found');
+        allConnected = false;
+        break;
+      } else {
+        thisPathfinder.moveSquare(path, connectedSquares, foundedConnectedSquare);
+      }
+    }
+
+    return allConnected;
+  }
+
+  moveSquare(path, connectedSquares, square) {
+    connectedSquares.push(square);
+    path.splice(path.indexOf(square), 1);
+  }
+
+  findConnection(connectedSquares, path) {
+    for (const connectedSquare of connectedSquares) {
+      for (const square of path) {
+        for (const neighbour of square.getLineNeighbours()) {
+          if (connectedSquare.isEqual(neighbour)) {
+            return square;
+          }
+        }
+      }
+    }
+    return false;
+  }
 }
-
-
 
 export default Pathfinder;

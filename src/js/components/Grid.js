@@ -11,6 +11,9 @@ class Grid {
 
     // all selected squares
     thisGrid.path = [];
+    
+    thisGrid.start = false;
+    thisGrid.end = false;
 
     thisGrid.initMap();
     thisGrid.render(wrapper);
@@ -67,26 +70,33 @@ class Grid {
     thisGrid.dom.table.addEventListener('click', function(event) {
       if (event.target.tagName == 'TD') {
         const cell = event.target;
-        const coords = cell.getAttribute('id').replace(settings.pathfinder.cellIdPrefix, '').split('-');
-        const x = parseInt(coords[0]);
-        const y = parseInt(coords[1]);
-        const clickedSquare = thisGrid.map[x][y];
-        
+        const clickedSquare = thisGrid.getSquareFromTableCell(cell);
+
         if (clickedSquare.isSelected()) {
-          clickedSquare.setSelected(false);
-          thisGrid.path.splice(thisGrid.path.indexOf(clickedSquare), 1);
-          cell.classList.remove(classNames.pathfinder.selected);
+          if (thisGrid.canUnselectSquare(clickedSquare)) {
+            clickedSquare.setSelected(false);
+            thisGrid.path.splice(thisGrid.path.indexOf(clickedSquare), 1);
+            cell.classList.remove(classNames.pathfinder.selected);
+          }
         } else if (thisGrid.canSelectSquare(clickedSquare)) {
           clickedSquare.setSelected(true);
           thisGrid.path.push(clickedSquare);
           cell.classList.add(classNames.pathfinder.selected);
         }
 
-        //console.log('corners', clickedSquare.getCornerNeighbours());
-        const finder = new Pathfinder(thisGrid.path);
-        console.log('neighbours', finder.getAllNeighboursInPath(clickedSquare));
+        console.log('path', thisGrid.path);
       }
     });
+  }
+
+  getSquareFromTableCell(cell) {
+    const thisGrid = this;
+
+    const coords = cell.getAttribute('id').replace(settings.pathfinder.cellIdPrefix, '').split('-');
+    const x = parseInt(coords[0]);
+    const y = parseInt(coords[1]);
+
+    return thisGrid.map[x][y];
   }
 
   canSelectSquare(clickedSquare) {
@@ -108,10 +118,20 @@ class Grid {
     return canSelect;
   }
 
-  canUnselectSquare(/*clickedSquare*/) {
-    //const thisGrid = this;
+  canUnselectSquare(clickedSquare) {
+    const thisGrid = this;
 
-    // unselection of square has an influence on neighbours only
+    const finder = new Pathfinder(thisGrid.path);
+
+    // get all selected squares around clicked square
+    //const pathToCheck = finder.getAllNeighboursInPath(clickedSquare);
+    const pathToCheck = thisGrid.path.slice();
+    pathToCheck.splice(pathToCheck.indexOf(clickedSquare), 1);
+    console.log(thisGrid.path.length, pathToCheck.length);
+    // check if unselection doesn't disrupt existing path
+    const canUnselect = finder.isLineConnectionForAllSquares(pathToCheck);
+
+    return canUnselect;
   }
 }
 
