@@ -1,4 +1,4 @@
-import { classNames, settings } from '../settings.js';
+import { classNames, settings, select, strings } from '../settings.js';
 import Pathfinder from './Pathfinder.js';
 import Square from './Square.js';
 
@@ -11,14 +11,22 @@ class Grid {
 
     // all selected squares
     thisGrid.path = [];
+
+    thisGrid.modes = {
+      drawing: 1,
+      markStartStop: 2,
+      compute: 3,
+    };
     
-    thisGrid.start = false;
-    thisGrid.end = false;
+    thisGrid.startSquare = false;
+    thisGrid.finishSquare = false;
 
     thisGrid.initMap();
     thisGrid.render(wrapper);
     thisGrid.createMapElement();
     thisGrid.initActions();
+
+    thisGrid.currentMode = thisGrid.modes.drawing;
   }
 
   initMap() {
@@ -38,6 +46,12 @@ class Grid {
 
     thisGrid.dom = {};
     thisGrid.dom.wrapper = wrapper;
+    thisGrid.dom.button = wrapper.querySelector(select.pathfinder.button);
+    thisGrid.dom.button.innerHTML = strings.pathfinder.buttons.finishDrawing;
+    thisGrid.dom.message = wrapper.querySelector(select.pathfinder.message);
+    thisGrid.dom.message.innerHTML = strings.pathfinder.messages.drawRoutes;
+    thisGrid.dom.error = wrapper.querySelector(select.pathfinder.error);
+    thisGrid.dom.error.innerHTML = '';
   }
 
   createMapElement() {
@@ -72,19 +86,75 @@ class Grid {
         const cell = event.target;
         const clickedSquare = thisGrid.getSquareFromTableCell(cell);
 
-        if (clickedSquare.isSelected()) {
-          if (thisGrid.canUnselectSquare(clickedSquare)) {
-            clickedSquare.setSelected(false);
-            thisGrid.path.splice(thisGrid.path.indexOf(clickedSquare), 1);
-            cell.classList.remove(classNames.pathfinder.selected);
+        if (thisGrid.currentMode == thisGrid.modes.drawing) {
+          if (clickedSquare.isSelected()) {
+            if (thisGrid.canUnselectSquare(clickedSquare)) {
+              clickedSquare.setSelected(false);
+              thisGrid.path.splice(thisGrid.path.indexOf(clickedSquare), 1);
+              cell.classList.remove(classNames.pathfinder.selected);
+            }
+          } else if (thisGrid.canSelectSquare(clickedSquare)) {
+            clickedSquare.setSelected(true);
+            thisGrid.path.push(clickedSquare);
+            cell.classList.add(classNames.pathfinder.selected);
           }
-        } else if (thisGrid.canSelectSquare(clickedSquare)) {
-          clickedSquare.setSelected(true);
-          thisGrid.path.push(clickedSquare);
-          cell.classList.add(classNames.pathfinder.selected);
+        } else if (thisGrid.currentMode == thisGrid.modes.markStartStop) {
+          if (clickedSquare.isSelected()) {
+            if (clickedSquare.isEqual(thisGrid.startSquare)) {
+              thisGrid.startSquare = false;
+              cell.classList.remove(classNames.pathfinder.start);
+              cell.innerHTML = clickedSquare.x + '-' + clickedSquare.y;
+            } else if (clickedSquare.isEqual(thisGrid.finishSquare)) {
+              thisGrid.finishSquare = false;
+              cell.classList.remove(classNames.pathfinder.finish);
+              cell.innerHTML = clickedSquare.x + '-' + clickedSquare.y;
+            } else if (!thisGrid.startSquare) {
+              thisGrid.startSquare = new Square(clickedSquare.x, clickedSquare.y);
+              cell.classList.add(classNames.pathfinder.start);
+              cell.innerHTML = 'S';
+            } else if (!thisGrid.finishSquare) {
+              thisGrid.finishSquare = new Square(clickedSquare.x, clickedSquare.y);
+              cell.classList.add(classNames.pathfinder.finish);
+              cell.innerHTML = 'F';
+            }
+          }
         }
+      }
+    });
 
-        console.log('path', thisGrid.path);
+    thisGrid.dom.button.addEventListener('click', function(event) {
+      event.preventDefault();
+
+      switch (thisGrid.currentMode) {
+      
+      case thisGrid.modes.drawing:
+        thisGrid.currentMode = thisGrid.modes.markStartStop;
+        thisGrid.dom.button.innerHTML = strings.pathfinder.buttons.compute;
+        thisGrid.dom.message.innerHTML = strings.pathfinder.messages.markStartFinish;
+        break;
+
+      case thisGrid.modes.markStartStop:
+        if (thisGrid.startSquare && thisGrid.finishSquare) {
+          /*const finder = new Pathfinder(thisGrid.path);
+          const shortestPath = finder.findShortestPath(
+            thisGrid.map[thisGrid.startSquare.x][thisGrid.startSquare.y],
+            thisGrid.map[thisGrid.finishSquare.x][thisGrid.finishSquare.y]
+          );*/
+
+          thisGrid.currentMode = thisGrid.modes.compute;
+          thisGrid.dom.button.innerHTML = strings.pathfinder.buttons.startAgain;
+          thisGrid.dom.message.innerHTML = strings.pathfinder.messages.result;
+        }
+        
+        break;
+
+      case thisGrid.modes.compute:
+        
+        thisGrid.currentMode = thisGrid.modes.drawing;
+        thisGrid.dom.button.innerHTML = strings.pathfinder.buttons.compute;
+        thisGrid.dom.message.innerHTML = strings.pathfinder.messages.drawRoutes;
+        break;
+
       }
     });
   }
@@ -123,11 +193,10 @@ class Grid {
 
     const finder = new Pathfinder(thisGrid.path);
 
-    // get all selected squares around clicked square
-    //const pathToCheck = finder.getAllNeighboursInPath(clickedSquare);
+    // get all selected squares excluding currently clicked
     const pathToCheck = thisGrid.path.slice();
     pathToCheck.splice(pathToCheck.indexOf(clickedSquare), 1);
-    console.log(thisGrid.path.length, pathToCheck.length);
+    
     // check if unselection doesn't disrupt existing path
     const canUnselect = finder.isLineConnectionForAllSquares(pathToCheck);
 

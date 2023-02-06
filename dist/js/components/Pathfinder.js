@@ -9,14 +9,14 @@ class Pathfinder {
     const thisPathfinder = this;
 
     const lineNeighbours = square.getLineNeighbours();
-    return thisPathfinder.findEqualSquaresInArrays(thisPathfinder.path, lineNeighbours);
+    return thisPathfinder.findSquaresInPath(lineNeighbours);
   }
 
   getCornerNeighboursInPath(square) {
     const thisPathfinder = this;
 
     const cornerNeighbours = square.getCornerNeighbours();
-    return thisPathfinder.findEqualSquaresInArrays(thisPathfinder.path, cornerNeighbours);
+    return thisPathfinder.findSquaresInPath(cornerNeighbours);
   }
 
   getAllNeighboursInPath(square) {
@@ -25,13 +25,15 @@ class Pathfinder {
     return thisPathfinder.getLineNeighboursInPath(square).concat(thisPathfinder.getCornerNeighboursInPath(square));
   }
 
-  findEqualSquaresInArrays(squaresArray1, squaresArray2) {
+  findSquaresInPath(squares) {
+    const thisPathfinder = this;
+
     const foundEquals = [];
 
-    for (const square1 of squaresArray1) {
-      for (const square2 of squaresArray2) {
-        if (square1.isEqual(square2)) {
-          foundEquals.push(square2);
+    for (const pathSquare of thisPathfinder.path) {
+      for (const square of squares) {
+        if (pathSquare.isEqual(square)) {
+          foundEquals.push(pathSquare);
         }
       }
     }
@@ -46,26 +48,21 @@ class Pathfinder {
     if (pathToCheck.length <= 1) {
       return true;
     }
-
-    // create copy of pathToCheck (in case of using it outside this method)
-    const path = pathToCheck.slice();
     
     const connectedSquares = [];
     let allConnected = true;
 
     // move first square to connected squares path as connected
-    thisPathfinder.moveSquare(path, connectedSquares, path[0]);
+    thisPathfinder.moveSquare(pathToCheck, connectedSquares, pathToCheck[0]);
 
     // remove connected squares from path until exhaustion path array,
-    while (path.length > 0) {
-      const foundedConnectedSquare = thisPathfinder.findConnection(connectedSquares, path);
-      if (!foundedConnectedSquare) {
-
-        console.log('not found');
+    while (pathToCheck.length > 0) {
+      const foundConnectedSquare = thisPathfinder.findConnection(connectedSquares, pathToCheck);
+      if (!foundConnectedSquare) {
         allConnected = false;
         break;
       } else {
-        thisPathfinder.moveSquare(path, connectedSquares, foundedConnectedSquare);
+        thisPathfinder.moveSquare(pathToCheck, connectedSquares, foundConnectedSquare);
       }
     }
 
@@ -89,6 +86,15 @@ class Pathfinder {
     }
     return false;
   }
+
+  //findShortestPath(startSquare, finishSquare) {
+  //const thisPathfinder = this;
+
+
+  //console.log('start neighbours', thisPathfinder.getLineNeighboursInPath(startSquare));
+  //console.log('start', startSquare.x + ',' + startSquare.y);
+  //console.log('finish', finishSquare.x + ',' + finishSquare.y);
+  //}
 }
 
 export default Pathfinder;

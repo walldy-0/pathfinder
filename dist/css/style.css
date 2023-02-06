@@ -15,8 +15,29 @@ table td:hover {
   background-color: green;
 }
 
+.message {
+  display: inline-block;
+  font-size: 14px;
+  margin-left: 20px;
+}
+
+.error {
+  display: inline-block;
+  font-size: 12px;
+  margin-left: 20px;
+  color: red;
+}
+
 .selected {
   background-color: red;
 }
 
-/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zYXNzL3N0eWxlLnNjc3MiLCJzdHlsZS5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBR0E7RUFDRSxzQkFBQTtBQ0ZGOztBREtBO0VBQ0UsdUJBUE87QUNLVDtBRElFO0VBQ0UsdUJBVks7RUFXTCxXQVpRO0VBYVIsWUFiUTtFQWNSLGtCQUFBO0FDRko7QURJSTtFQUNFLHVCQUFBO0FDRk47O0FET0E7RUFDRSxxQkFBQTtBQ0pGIiwiZmlsZSI6InN0eWxlLmNzcyJ9 */
+.start {
+  background-color: blue;
+}
+
+.finish {
+  background-color: blue;
+}
+
+/*# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJzb3VyY2VzIjpbIi4uLy4uL3NyYy9zYXNzL3N0eWxlLnNjc3MiLCJzdHlsZS5jc3MiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBR0E7RUFDRSxzQkFBQTtBQ0ZGOztBREtBO0VBQ0UsdUJBUE87QUNLVDtBRElFO0VBQ0UsdUJBVks7RUFXTCxXQVpRO0VBYVIsWUFiUTtFQWNSLGtCQUFBO0FDRko7QURJSTtFQUNFLHVCQUFBO0FDRk47O0FET0E7RUFDRSxxQkFBQTtFQUNBLGVBQUE7RUFDQSxpQkFBQTtBQ0pGOztBRE9BO0VBQ0UscUJBQUE7RUFDQSxlQUFBO0VBQ0EsaUJBQUE7RUFDQSxVQUFBO0FDSkY7O0FET0E7RUFDRSxxQkFBQTtBQ0pGOztBRE9BO0VBQ0Usc0JBQUE7QUNKRjs7QURPQTtFQUNFLHNCQUFBO0FDSkYiLCJmaWxlIjoic3R5bGUuY3NzIn0= */

@@ -20,7 +20,28 @@ table {
   }
 }
 
+.message {
+  display: inline-block;
+  font-size: 14px;
+  margin-left: 20px;
+}
+
+.error {
+  display: inline-block;
+  font-size: 12px;
+  margin-left: 20px;
+  color: red;
+}
+
 .selected {
   background-color: red;
+}
+
+.start {
+  background-color: blue;
+}
+
+.finish {
+  background-color: blue;
 }
 

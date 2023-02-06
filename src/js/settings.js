@@ -2,6 +2,12 @@ export const select = {
   containerOf: {
     pathfinder: '.pathfinder-container',
   },
+
+  pathfinder: {
+    button: '.button',
+    message: '.message',
+    error: '.error',
+  },
 };
 
 export const settings = {
@@ -15,5 +21,23 @@ export const settings = {
 export const classNames = {
   pathfinder: {
     selected: 'selected',
+    start: 'start',
+    finish: 'finish',
+  },
+};
+
+export const strings = {
+  pathfinder: {
+    buttons: {
+      finishDrawing: 'finish drawing',
+      compute: 'compute',
+      startAgain: 'start again',
+    },
+
+    messages: {
+      drawRoutes: 'draw routes',
+      markStartFinish: 'pick start and finish',
+      result: 'the best route is...',
+    },
   },
 };
