@@ -87,14 +87,82 @@ class Pathfinder {
     return false;
   }
 
-  //findShortestPath(startSquare, finishSquare) {
-  //const thisPathfinder = this;
+  findShortestPath(startSquare, finishSquare) {
+    const thisPathfinder = this;
 
+    const variants = [];
+    let foundShortestPath = [];
+
+    variants[0] = [startSquare];
+    
+
+    do {
+      const newVariants = [];
+      
+      for (let i = 0; i < variants.length; i++) {
+        const variant = variants[i];
+
+        if (foundShortestPath.length > 0 && foundShortestPath.length <= variant.length) {
+          variants.splice(i, 1);
+          i--;
+          continue;
+        }
+
+        const currentSquare = variant[variant.length - 1];
+        const nextSquares = thisPathfinder.getLineNeighboursInPath(currentSquare);
+
+        // found path between start and finish, no need to check other squares
+        if (nextSquares.indexOf(finishSquare) > -1) {
+          // replace current shortestPath when variant is shorter
+          if (foundShortestPath.length > 0 && variant.length + 1 < foundShortestPath.length) {
+            foundShortestPath = variant.slice().push(finishSquare);
+          }
+          variants.splice(i, 1);
+          i--;
+          continue;
+        }
+
+        const possibleNextSquares = [];
+
+        for (let j = 0; j < nextSquares.length; j++) {
+          const nextSquare = nextSquares[j];
+
+          // continuation of path makes sense only for unique squares
+          if (variant.indexOf(nextSquare) < 0) {
+            possibleNextSquares.push(nextSquare);
+          }
+        }
+
+        let isCurrentVariantContinuation = true;
+
+        for (const possibleNextSquare of possibleNextSquares) {
+          if (isCurrentVariantContinuation) {
+            variant.push(possibleNextSquare);
+            isCurrentVariantContinuation = false;
+          } else {
+            newVariants.push(variant.slice().push(possibleNextSquare));
+          }
+        }
+
+      }
+
+      if (newVariants.length > 0) {
+        variants.concat(newVariants);
+      }
+      
+    } while (variants.length > 0);
+    
+
+
+    
+    
 
   //console.log('start neighbours', thisPathfinder.getLineNeighboursInPath(startSquare));
   //console.log('start', startSquare.x + ',' + startSquare.y);
   //console.log('finish', finishSquare.x + ',' + finishSquare.y);
-  //}
+
+    return foundShortestPath;
+  }
 }
 
 export default Pathfinder;

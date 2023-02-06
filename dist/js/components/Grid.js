@@ -135,11 +135,13 @@ class Grid {
 
       case thisGrid.modes.markStartStop:
         if (thisGrid.startSquare && thisGrid.finishSquare) {
-          /*const finder = new Pathfinder(thisGrid.path);
+          const finder = new Pathfinder(thisGrid.path);
           const shortestPath = finder.findShortestPath(
             thisGrid.map[thisGrid.startSquare.x][thisGrid.startSquare.y],
             thisGrid.map[thisGrid.finishSquare.x][thisGrid.finishSquare.y]
-          );*/
+          );
+
+          console.log(shortestPath);
 
           thisGrid.currentMode = thisGrid.modes.compute;
           thisGrid.dom.button.innerHTML = strings.pathfinder.buttons.startAgain;
