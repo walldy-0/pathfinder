@@ -127,7 +127,7 @@ class Pathfinder {
         for (let j = 0; j < nextSquares.length; j++) {
           const nextSquare = nextSquares[j];
 
-          // continuation of path makes sense only for unique squares
+          // continuation of path makes sense only with unique squares
           if (variant.indexOf(nextSquare) < 0) {
             possibleNextSquares.push(nextSquare);
           }
@@ -140,16 +140,23 @@ class Pathfinder {
             variant.push(possibleNextSquare);
             isCurrentVariantContinuation = false;
           } else {
-            newVariants.push(variant.slice().push(possibleNextSquare));
+            const newVariant = variant.slice();
+            newVariant.splice(newVariant.length - 1, 1);
+            newVariant.push(possibleNextSquare);
+            newVariants.push(newVariant);
+            //console.log('newVariant', newVariant);
+            //newVariants.push(variant.slice().splice(variant.length - 1, 1).push(possibleNextSquare));
           }
         }
 
       }
 
       if (newVariants.length > 0) {
-        variants.concat(newVariants);
+        for (const newVariant of newVariants) {
+          variants.push(newVariant);
+        }
       }
-      
+      console.log(variants);
     } while (variants.length > 0);
     
 
@@ -157,9 +164,9 @@ class Pathfinder {
     
     
 
-  //console.log('start neighbours', thisPathfinder.getLineNeighboursInPath(startSquare));
-  //console.log('start', startSquare.x + ',' + startSquare.y);
-  //console.log('finish', finishSquare.x + ',' + finishSquare.y);
+    //console.log('start neighbours', thisPathfinder.getLineNeighboursInPath(startSquare));
+    //console.log('start', startSquare.x + ',' + startSquare.y);
+    //console.log('finish', finishSquare.x + ',' + finishSquare.y);
 
     return foundShortestPath;
   }
