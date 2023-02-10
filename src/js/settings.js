@@ -4,6 +4,7 @@ export const select = {
   },
 
   pathfinder: {
+    grid: '.grid-wrapper',
     button: '.button',
     message: '.message',
     error: '.error',
@@ -23,6 +24,7 @@ export const classNames = {
     selected: 'selected',
     start: 'start',
     finish: 'finish',
+    markedPath: 'shortest-path',
   },
 };
 

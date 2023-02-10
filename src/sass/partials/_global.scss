@@ -1,0 +1,53 @@
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: $color-dark;
+  color: $color-light;
+  font-size: 14px;
+  font-family: $font-main;
+}
+
+.main-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  height: 200vh;
+}
+
+.hero {
+  height: 100vh;
+  position: relative;
+  background-image: url('../../images/background.jpg');
+  background-position: center center;
+  background-size: cover;
+}
+
+.hero-inner {
+  position: absolute;
+  display: inline-block;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+
+  h1 {
+    letter-spacing: $letter-spacing-wide;
+    margin-right: -$letter-spacing-wide;
+  }
+
+  h3 {
+    text-align: right;
+    letter-spacing: $letter-spacing-narrow;
+    margin-right: -$letter-spacing-narrow;
+  }
+}
+
+.content {
+  border: 2px solid white;
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+}

@@ -1,0 +1,23 @@
+h1, h2, h3 {
+  text-transform: uppercase;
+}
+
+h1 {
+  font-size: 4 * $base-size;
+  font-weight: 900;
+}
+
+h2 {
+  font-size: 2.33 * $base-size;
+  font-weight: 700;
+}
+
+h3 {
+  font-size: 1.33 * $base-size;
+  font-weight: 600;
+}
+
+h4 {
+  font-size: 1.5 * $base-size;
+  font-weight: 400;
+}

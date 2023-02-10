@@ -1,47 +1,6 @@
-$cell-size: 40px;
-$border: 1px solid black;
-
-*, *::before, *::after {
-  box-sizing: border-box;
-}
-
-table {
-  border: $border;
-
-  td {
-    border: $border;
-    width: $cell-size;
-    height: $cell-size;
-    text-align: center;
-
-    &:hover {
-      background-color: green;
-    }
-  }
-}
-
-.message {
-  display: inline-block;
-  font-size: 14px;
-  margin-left: 20px;
-}
-
-.error {
-  display: inline-block;
-  font-size: 12px;
-  margin-left: 20px;
-  color: red;
-}
-
-.selected {
-  background-color: red;
-}
-
-.start {
-  background-color: blue;
-}
-
-.finish {
-  background-color: blue;
-}
+@import 'partials/settings';
+@import 'partials/typography';
+@import 'partials/global';
+@import 'partials/elements';
+@import 'partials/grid';
 

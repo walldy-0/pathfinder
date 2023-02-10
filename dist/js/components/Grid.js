@@ -141,6 +141,12 @@ class Grid {
             thisGrid.map[thisGrid.finishSquare.x][thisGrid.finishSquare.y]
           );
 
+          for (const square of shortestPath) {
+            const cell = document.getElementById(settings.pathfinder.cellIdPrefix + square.x + '-' + square.y);
+            
+            cell.setAttribute('class', classNames.pathfinder.markedPath);
+          }
+
           console.log(shortestPath);
 
           thisGrid.currentMode = thisGrid.modes.compute;

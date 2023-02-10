@@ -1,0 +1,40 @@
+table {
+  border: $grid-border;
+
+  td {
+    border: $grid-border;
+    width: $grid-cell-size;
+    height: $grid-cell-size;
+    text-align: center;
+
+    &:hover {
+      cursor: pointer;
+      background-color: green;
+    }
+  }
+}
+
+.message {
+  display: inline-block;
+  font-size: 14px;
+  margin-left: 20px;
+}
+
+.error {
+  display: inline-block;
+  font-size: 12px;
+  margin-left: 20px;
+  color: red;
+}
+
+.selected {
+  background-color: $color-main;
+}
+
+.start, .finish {
+  background-color: $color-start-finish;
+}
+
+.shortest-path {
+  background-color: $color-shortest-path;
+}
