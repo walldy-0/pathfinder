@@ -55,7 +55,7 @@ class Pathfinder {
     // move first square to connected squares path as connected
     thisPathfinder.moveSquare(pathToCheck, connectedSquares, pathToCheck[0]);
 
-    // remove connected squares from path until exhaustion path array,
+    // remove connected squares from path until exhaustion of path array
     while (pathToCheck.length > 0) {
       const foundConnectedSquare = thisPathfinder.findConnection(connectedSquares, pathToCheck);
       if (!foundConnectedSquare) {
@@ -90,83 +90,70 @@ class Pathfinder {
   findShortestPath(startSquare, finishSquare) {
     const thisPathfinder = this;
 
-    const variants = [];
+    // array of Squares from start to end in steps order (return value)
     let foundShortestPath = [];
 
+    // every potential variant of path between start and finish square
+    let variants = [];
+
+    // initiation of first variant - it must be startSquare
     variants[0] = [startSquare];
     
-
     do {
+      // every incremented version of existing variants[]
       const newVariants = [];
       
       for (let i = 0; i < variants.length; i++) {
         const variant = variants[i];
 
+        // TODO move this code below?
         if (foundShortestPath.length > 0 && foundShortestPath.length <= variant.length) {
           variants.splice(i, 1);
           i--;
           continue;
         }
+        
 
+        // last Square of current path variant
         const currentSquare = variant[variant.length - 1];
+
+        // every possible next step in selected path
         const nextSquares = thisPathfinder.getLineNeighboursInPath(currentSquare);
 
-        // found path between start and finish, no need to check other squares
+        // found path between start and finish
         if (nextSquares.indexOf(finishSquare) > -1) {
-          // replace current shortestPath when variant is shorter
-          if (foundShortestPath.length > 0 && variant.length + 1 < foundShortestPath.length) {
-            foundShortestPath = variant.slice().push(finishSquare);
+          const foundPath = variant.slice();
+          foundPath.push(finishSquare);
+          
+          if (foundShortestPath.length > 0) {
+            if (foundPath.length < foundShortestPath.length) {
+              foundShortestPath = foundPath;
+            }
+          } else {
+            foundShortestPath = foundPath;
           }
+          
+          //no need to check other squares - shortest way already found for this variant
           variants.splice(i, 1);
           i--;
           continue;
         }
 
-        const possibleNextSquares = [];
-
-        for (let j = 0; j < nextSquares.length; j++) {
-          const nextSquare = nextSquares[j];
-
+        for (const nextSquare of nextSquares) {
           // continuation of path makes sense only with unique squares
           if (variant.indexOf(nextSquare) < 0) {
-            possibleNextSquares.push(nextSquare);
-          }
-        }
-
-        let isCurrentVariantContinuation = true;
-
-        for (const possibleNextSquare of possibleNextSquares) {
-          if (isCurrentVariantContinuation) {
-            variant.push(possibleNextSquare);
-            isCurrentVariantContinuation = false;
-          } else {
             const newVariant = variant.slice();
-            newVariant.splice(newVariant.length - 1, 1);
-            newVariant.push(possibleNextSquare);
+            newVariant.push(nextSquare);
             newVariants.push(newVariant);
-            //console.log('newVariant', newVariant);
-            //newVariants.push(variant.slice().splice(variant.length - 1, 1).push(possibleNextSquare));
           }
         }
-
       }
 
-      if (newVariants.length > 0) {
-        for (const newVariant of newVariants) {
-          variants.push(newVariant);
-        }
-      }
-      console.log(variants);
+      // new version of variants[]
+      variants = newVariants.slice();
+
+    // variants possibilities exhausted
     } while (variants.length > 0);
-    
-
-
-    
-    
-
-    //console.log('start neighbours', thisPathfinder.getLineNeighboursInPath(startSquare));
-    //console.log('start', startSquare.x + ',' + startSquare.y);
-    //console.log('finish', finishSquare.x + ',' + finishSquare.y);
 
     return foundShortestPath;
   }
