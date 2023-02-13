@@ -1,3 +1,33 @@
-.a {
-  display: inline;
+$image-section-1-width: 450px;
+$image-section-1-height: 300px;
+$image-section-2-width: 740px;
+$image-section-2-height: 385px;
+
+.about-section-1 {
+  margin: 70px 0 0 60px;
+
+  img {
+    width: $image-section-1-width;
+    height: $image-section-1-height;
+  }
+
+  .text-wrapper {
+    transform: translate(0.5 * $image-section-1-width, -0.3 * $image-section-1-height);
+  }
+}
+
+.about-section-2 {
+  text-align: right;
+  margin-right: 30px;
+
+  img {
+    width: $image-section-2-width;
+    height: $image-section-2-height;
+  }
+
+  .text-wrapper {
+    display: inline-block;
+    text-align: left;
+    transform: translate(-0.65 * $image-section-2-width, -0.9 * $image-section-2-height);
+  }
 }
