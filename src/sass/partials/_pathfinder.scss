@@ -1,8 +1,17 @@
+.pathfinder-container {
+  position: absolute;
+  top: -50%;
+  left: 50%;
+  transform: translate(-50%, -44%);
+}
+
 table {
   border: $grid-border;
 
   td {
     border: $grid-border;
+    min-width: $grid-cell-size;
+    min-height: $grid-cell-size;
     width: $grid-cell-size;
     height: $grid-cell-size;
     text-align: center;
@@ -15,16 +24,11 @@ table {
 }
 
 .message {
-  display: inline-block;
-  font-size: 14px;
-  margin-left: 20px;
+  text-align: center;
 }
 
 .error {
-  display: inline-block;
-  font-size: 12px;
-  margin-left: 20px;
-  color: red;
+  text-align: center;
 }
 
 .selected {
@@ -37,4 +41,10 @@ table {
 
 .shortest-path {
   background-color: $color-shortest-path;
+}
+
+.button-wrapper {
+  height: 100px;
+  text-align: center;
+  margin-top: 3.0em;
 }

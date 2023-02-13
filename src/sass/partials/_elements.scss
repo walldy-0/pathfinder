@@ -1,4 +1,8 @@
 .button {
+  color: $color-light;
   background: $color-main;
-  margin: 1.7em 3.0em;
+  font-size: 16px;
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: 0.8em 2.0em;
 }

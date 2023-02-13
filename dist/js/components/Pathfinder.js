@@ -1,161 +1,250 @@
+import { classNames, settings, select, strings } from '../settings.js';
+import Finder from './Finder.js';
+import Square from './Square.js';
+
 class Pathfinder {
-  constructor(path) {
+  constructor(wrapper) {
     const thisPathfinder = this;
 
-    thisPathfinder.path = path;
-  }
-
-  getLineNeighboursInPath(square) {
-    const thisPathfinder = this;
-
-    const lineNeighbours = square.getLineNeighbours();
-    return thisPathfinder.findSquaresInPath(lineNeighbours);
-  }
-
-  getCornerNeighboursInPath(square) {
-    const thisPathfinder = this;
-
-    const cornerNeighbours = square.getCornerNeighbours();
-    return thisPathfinder.findSquaresInPath(cornerNeighbours);
-  }
-
-  getAllNeighboursInPath(square) {
-    const thisPathfinder = this;
+    thisPathfinder.modes = {
+      drawing: 1,
+      markStartStop: 2,
+      compute: 3,
+    };
     
-    return thisPathfinder.getLineNeighboursInPath(square).concat(thisPathfinder.getCornerNeighboursInPath(square));
+    thisPathfinder.startSquare = false;
+    thisPathfinder.finishSquare = false;
+
+    thisPathfinder.initMatrix();
+    thisPathfinder.render(wrapper);
+    thisPathfinder.createGridElement();
+    thisPathfinder.initActions();
+
+    thisPathfinder.currentMode = thisPathfinder.modes.drawing;
+
+    //this.fillAll();
   }
 
-  findSquaresInPath(squares) {
+  fillAll() {
     const thisPathfinder = this;
 
-    const foundEquals = [];
+    this.resetGrid();
 
-    for (const pathSquare of thisPathfinder.path) {
-      for (const square of squares) {
-        if (pathSquare.isEqual(square)) {
-          foundEquals.push(pathSquare);
-        }
+    for (let x = 0; x <= settings.pathfinder.maxX - 3; x++) {
+
+      for (let y = 0; y <= settings.pathfinder.maxY - 3; y++) {
+        thisPathfinder.matrix[x][y].selected = true;
+        document.getElementById('cell-' + x + '-' + y).classList.add(classNames.pathfinder.selected);
       }
     }
-
-    return foundEquals;
   }
 
-  isLineConnectionForAllSquares(pathToCheck) {
+  initMatrix() {
     const thisPathfinder = this;
 
-    // no need to check a single square, it isn't connector between other squares
-    if (pathToCheck.length <= 1) {
-      return true;
-    }
-    
-    const connectedSquares = [];
-    let allConnected = true;
+    // matrix of Squares
+    thisPathfinder.matrix = [];
 
-    // move first square to connected squares path as connected
-    thisPathfinder.moveSquare(pathToCheck, connectedSquares, pathToCheck[0]);
+    for (let x = 0; x <= settings.pathfinder.maxX; x++) {
+      thisPathfinder.matrix[x] = [];
 
-    // remove connected squares from path until exhaustion of path array
-    while (pathToCheck.length > 0) {
-      const foundConnectedSquare = thisPathfinder.findConnection(connectedSquares, pathToCheck);
-      if (!foundConnectedSquare) {
-        allConnected = false;
-        break;
-      } else {
-        thisPathfinder.moveSquare(pathToCheck, connectedSquares, foundConnectedSquare);
+      for (let y = 0; y <= settings.pathfinder.maxY; y++) {
+        thisPathfinder.matrix[x][y] = new Square(x, y);
       }
     }
-
-    return allConnected;
   }
 
-  moveSquare(path, connectedSquares, square) {
-    connectedSquares.push(square);
-    path.splice(path.indexOf(square), 1);
+  render(wrapper) {
+    const thisPathfinder = this;
+
+    thisPathfinder.dom = {};
+    thisPathfinder.dom.wrapper = wrapper;
+    thisPathfinder.dom.button = wrapper.querySelector(select.pathfinder.button);
+    thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.finishDrawing;
+    thisPathfinder.dom.message = wrapper.querySelector(select.pathfinder.message);
+    thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.drawRoutes;
+    thisPathfinder.dom.error = wrapper.querySelector(select.pathfinder.error);
+    thisPathfinder.dom.error.innerHTML = '&nbsp;';
+    thisPathfinder.dom.gridWrapper = wrapper.querySelector(select.pathfinder.gridWrapper);
   }
 
-  findConnection(connectedSquares, path) {
-    for (const connectedSquare of connectedSquares) {
-      for (const square of path) {
-        for (const neighbour of square.getLineNeighbours()) {
-          if (connectedSquare.isEqual(neighbour)) {
-            return square;
+  createGridElement() {
+    const thisPathfinder = this;
+
+    thisPathfinder.dom.table = document.createElement('table');
+    thisPathfinder.dom.table.setAttribute('cellspacing', '0');
+    thisPathfinder.dom.table.setAttribute('cellpadding', '0');
+
+    for (let y = 0; y <= settings.pathfinder.maxY; y++) {
+      const row = document.createElement('tr');
+
+      for (let x = 0; x <= settings.pathfinder.maxX; x++) {
+        const cell = document.createElement('td');
+        //cell.innerHTML = x + '-' + y;
+
+        cell.setAttribute('id', settings.pathfinder.cellIdPrefix + x + '-' + y);
+        row.appendChild(cell);
+      }
+
+      thisPathfinder.dom.table.appendChild(row);
+    }
+
+    thisPathfinder.dom.gridWrapper.appendChild(thisPathfinder.dom.table);
+  }
+
+  initActions() {
+    const thisPathfinder = this;
+
+    thisPathfinder.dom.table.addEventListener('click', function(event) {
+      if (event.target.tagName == 'TD') {
+        const cell = event.target;
+        const clickedSquare = thisPathfinder.getSquareFromTableCell(cell);
+
+        thisPathfinder.dom.error.innerHTML = '&nbsp;';
+
+        if (thisPathfinder.currentMode == thisPathfinder.modes.drawing) {
+          if (clickedSquare.selected) {
+            if (thisPathfinder.canUnselectSquare(clickedSquare)) {
+              clickedSquare.selected = false;
+              cell.classList.remove(classNames.pathfinder.selected);
+            }
+          } else if (thisPathfinder.canSelectSquare(clickedSquare)) {
+            clickedSquare.selected = true;
+            cell.classList.add(classNames.pathfinder.selected);
+          }
+        } else if (thisPathfinder.currentMode == thisPathfinder.modes.markStartStop) {
+          if (clickedSquare.selected) {
+            if (clickedSquare.isEqual(thisPathfinder.startSquare)) {
+              thisPathfinder.startSquare = false;
+              cell.classList.remove(classNames.pathfinder.start);
+              cell.innerHTML = '';
+            } else if (clickedSquare.isEqual(thisPathfinder.finishSquare)) {
+              thisPathfinder.finishSquare = false;
+              cell.classList.remove(classNames.pathfinder.finish);
+              cell.innerHTML = '';
+            } else if (!thisPathfinder.startSquare) {
+              thisPathfinder.startSquare = new Square(clickedSquare.x, clickedSquare.y);
+              cell.classList.add(classNames.pathfinder.start);
+              cell.innerHTML = 'Start';
+            } else if (!thisPathfinder.finishSquare) {
+              thisPathfinder.finishSquare = new Square(clickedSquare.x, clickedSquare.y);
+              cell.classList.add(classNames.pathfinder.finish);
+              cell.innerHTML = 'Finish';
+            }
           }
         }
       }
-    }
-    return false;
-  }
+    });
 
-  findShortestPath(startSquare, finishSquare) {
-    const thisPathfinder = this;
+    thisPathfinder.dom.button.addEventListener('click', function(event) {
+      event.preventDefault();
 
-    // array of Squares from start to end in steps order (return value)
-    let foundShortestPath = [];
+      thisPathfinder.dom.error.innerHTML = '&nbsp;';
 
-    // every potential variant of path between start and finish square
-    let variants = [];
-
-    // initiation of first variant - it must be startSquare
-    variants[0] = [startSquare];
-    
-    do {
-      // every incremented version of existing variants[]
-      const newVariants = [];
+      switch (thisPathfinder.currentMode) {
       
-      for (let i = 0; i < variants.length; i++) {
-        const variant = variants[i];
+      case thisPathfinder.modes.drawing:
+        thisPathfinder.currentMode = thisPathfinder.modes.markStartStop;
+        thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.compute;
+        thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.markStartFinish;
+        break;
 
-        // TODO move this code below?
-        if (foundShortestPath.length > 0 && foundShortestPath.length <= variant.length) {
-          variants.splice(i, 1);
-          i--;
-          continue;
+      case thisPathfinder.modes.markStartStop:
+        if (thisPathfinder.startSquare && thisPathfinder.finishSquare) {
+          const finder = new Finder(thisPathfinder.matrix);
+          const shortestPath = finder.findShortestPath(
+            thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
+            thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
+          );
+          
+          for (const square of shortestPath) {
+            const cell = document.getElementById(settings.pathfinder.cellIdPrefix + square.x + '-' + square.y);
+            
+            cell.setAttribute('class', classNames.pathfinder.markedPath);
+          }
+          
+          thisPathfinder.currentMode = thisPathfinder.modes.compute;
+          thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.startAgain;
+          thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.result;
+        } else {
+          thisPathfinder.dom.error.innerHTML = strings.pathfinder.errors.markStartFinish;
         }
         
+        break;
 
-        // last Square of current path variant
-        const currentSquare = variant[variant.length - 1];
+      case thisPathfinder.modes.compute:
+        thisPathfinder.resetGrid();
+        thisPathfinder.currentMode = thisPathfinder.modes.drawing;
+        thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.finishDrawing;
+        thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.drawRoutes;
+        break;
 
-        // every possible next step in selected path
-        const nextSquares = thisPathfinder.getLineNeighboursInPath(currentSquare);
-
-        // found path between start and finish
-        if (nextSquares.indexOf(finishSquare) > -1) {
-          const foundPath = variant.slice();
-          foundPath.push(finishSquare);
-          
-          if (foundShortestPath.length > 0) {
-            if (foundPath.length < foundShortestPath.length) {
-              foundShortestPath = foundPath;
-            }
-          } else {
-            foundShortestPath = foundPath;
-          }
-          
-          //no need to check other squares - shortest way already found for this variant
-          variants.splice(i, 1);
-          i--;
-          continue;
-        }
-
-        for (const nextSquare of nextSquares) {
-          // continuation of path makes sense only with unique squares
-          if (variant.indexOf(nextSquare) < 0) {
-            const newVariant = variant.slice();
-            newVariant.push(nextSquare);
-            newVariants.push(newVariant);
-          }
-        }
       }
+    });
+  }
 
-      // new version of variants[]
-      variants = newVariants.slice();
+  getSquareFromTableCell(cell) {
+    const thisPathfinder = this;
 
-    // variants possibilities exhausted
-    } while (variants.length > 0);
+    const coords = cell.getAttribute('id').replace(settings.pathfinder.cellIdPrefix, '').split('-');
+    const x = parseInt(coords[0]);
+    const y = parseInt(coords[1]);
 
-    return foundShortestPath;
+    return thisPathfinder.matrix[x][y];
+  }
+
+  canSelectSquare(clickedSquare) {
+    const thisPathfinder = this;
+
+    const canSelect = thisPathfinder.canToggleSquare(clickedSquare);
+
+    if (!canSelect) {
+      thisPathfinder.dom.error.innerHTML = strings.pathfinder.errors.cantSelectField;
+    }
+
+    return canSelect;
+  }
+
+  canUnselectSquare(clickedSquare) {
+    const thisPathfinder = this;
+
+    const canUnselect = thisPathfinder.canToggleSquare(clickedSquare);
+
+    if (!canUnselect) {
+      thisPathfinder.dom.error.innerHTML = strings.pathfinder.errors.cantUnselectField;
+    }
+    
+    return canUnselect;
+  }
+
+  canToggleSquare(clickedSquare) {
+    const thisPathfinder = this;
+
+    // temporary toggle selected state
+    clickedSquare.selected = !clickedSquare.selected;
+
+    const finder = new Finder(thisPathfinder.matrix);
+    const canToggle = finder.checkAllSquaresConnected();
+
+    // restore selection
+    clickedSquare.selected = !clickedSquare.selected;
+
+    return canToggle;
+  }
+
+  resetGrid() {
+    const thisPathfinder = this;
+
+    for (const row of thisPathfinder.dom.table.children) {
+      for (const cell of row.children) {
+        cell.innerHTML = '';
+        cell.removeAttribute('class');
+      }
+    }
+
+    thisPathfinder.initMatrix();
+    thisPathfinder.startSquare = false;
+    thisPathfinder.finishSquare = false;
   }
 }
 

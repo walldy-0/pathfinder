@@ -7,18 +7,9 @@ class Square {
     thisSquare.x = x;
     thisSquare.y = y;
     thisSquare.selected = false;
-  }
-
-  isSelected() {
-    const thisSquare = this;
-
-    return thisSquare.selected;
-  }
-
-  setSelected(selected) {
-    const thisSquare = this;
-
-    thisSquare.selected = selected;
+    thisSquare.visited = false;
+    thisSquare.parent = undefined;
+    thisSquare.way = Number.MAX_SAFE_INTEGER;
   }
 
   isLineNeighbourOf(otherSquare) {

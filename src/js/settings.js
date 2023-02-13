@@ -1,13 +1,18 @@
 export const select = {
   containerOf: {
     pathfinder: '.pathfinder-container',
+    pages: '.content',
   },
 
   pathfinder: {
-    grid: '.grid-wrapper',
+    gridWrapper: '.grid-wrapper',
     button: '.button',
     message: '.message',
     error: '.error',
+  },
+
+  menu: {
+    links: '.menu a',
   },
 };
 
@@ -26,6 +31,14 @@ export const classNames = {
     finish: 'finish',
     markedPath: 'shortest-path',
   },
+
+  menu: {
+    active: 'active',
+  },
+
+  pages: {
+    active: 'active',
+  },
 };
 
 export const strings = {
@@ -41,5 +54,11 @@ export const strings = {
       markStartFinish: 'pick start and finish',
       result: 'the best route is...',
     },
+
+    errors: {
+      cantSelectField: 'You can\'t select this field',
+      cantUnselectField: 'You can\'t unselect this field',
+      markStartFinish: 'Pick start and finish fields',
+    }
   },
 };
