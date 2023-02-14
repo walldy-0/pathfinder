@@ -119,11 +119,10 @@ class Finder {
         }
       }
 
+      // in extremly cases (e.g. fully drawed matrix) loop will be aborted
       thisFinder.abortExecution = Date.now() - thisFinder.startTime > settings.pathfinder.maxSearchExecutionTime; 
 
     } while (queue.length > 0 && !thisFinder.abortExecution);
-
-    //console.log('executionTime', Date.now() - thisFinder.startTime);
 
     if (!thisFinder.abortExecution) {
       const pathInverted = [finishSquare];
@@ -145,15 +144,6 @@ class Finder {
 
       thisFinder.shortestPath = path;
     }
-
-    
-    /*
-    const path = [];
-    for (let i = pathInverted.length - 1; i >= 0; i--) {
-      path.push(pathInverted[i]);
-    }
-
-    return path;*/
   }
 
   findLongestPath(startSquare, finishSquare) {
@@ -165,18 +155,18 @@ class Finder {
     thisFinder.abortExecution = false;
     thisFinder.longestPath = [];
     
+    // search all possible connections from start to finish square
     thisFinder.findPath(startSquare, finishSquare);
 
     if (thisFinder.abortExecution) {
       thisFinder.longestPath = undefined;
     }
-
-    //return thisFinder.longestPath;
   }
 
   findPath(startSquare, finishSquare) {
     const thisFinder = this;
 
+    // in extremly cases (e.g. fully drawed matrix) loop will be aborted
     thisFinder.abortExecution = Date.now() - thisFinder.startTime > settings.pathfinder.maxSearchExecutionTime;
 
     if (!startSquare.visited && !thisFinder.abortExecution) {

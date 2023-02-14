@@ -7,6 +7,8 @@ class Square {
     thisSquare.x = x;
     thisSquare.y = y;
     thisSquare.selected = false;
+
+    // searching connections between other squares variables
     thisSquare.visited = false;
     thisSquare.parent = undefined;
     thisSquare.distance = Number.MAX_SAFE_INTEGER;

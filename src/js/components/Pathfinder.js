@@ -12,31 +12,13 @@ class Pathfinder {
       compute: 3,
     };
     
+    thisPathfinder.currentMode = thisPathfinder.modes.drawing;
     thisPathfinder.startSquare = false;
     thisPathfinder.finishSquare = false;
-
     thisPathfinder.initMatrix();
     thisPathfinder.render(wrapper);
     thisPathfinder.createGridElement();
     thisPathfinder.initActions();
-
-    thisPathfinder.currentMode = thisPathfinder.modes.drawing;
-
-    this.fillAll(0);
-  }
-
-  fillAll(decreaseBy) {
-    const thisPathfinder = this;
-
-    this.resetGrid();
-
-    for (let x = 0; x <= settings.pathfinder.maxX - decreaseBy; x++) {
-
-      for (let y = 0; y <= settings.pathfinder.maxY - decreaseBy; y++) {
-        thisPathfinder.matrix[x][y].selected = true;
-        document.getElementById('cell-' + x + '-' + y).classList.add(classNames.pathfinder.selected);
-      }
-    }
   }
 
   initMatrix() {
@@ -99,6 +81,7 @@ class Pathfinder {
   initActions() {
     const thisPathfinder = this;
 
+    // grid actions
     thisPathfinder.dom.table.addEventListener('click', function(event) {
       if (event.target.tagName == 'TD') {
         const cell = event.target;
@@ -142,6 +125,7 @@ class Pathfinder {
       }
     });
 
+    // button actions
     thisPathfinder.dom.button.addEventListener('click', function(event) {
       event.preventDefault();
 
@@ -163,16 +147,6 @@ class Pathfinder {
 
       case thisPathfinder.modes.markStartStop:
         if (thisPathfinder.startSquare && thisPathfinder.finishSquare) {
-          /*const shortestPath = finder.findShortestPath(
-            thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
-            thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
-          );*/
-
-          /*const longestPath = finder.findLongestPath(
-            thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
-            thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
-          );*/
-          
           finder.findShortestPath(
             thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
             thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
@@ -194,12 +168,10 @@ class Pathfinder {
           thisPathfinder.currentMode = thisPathfinder.modes.compute;
           thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.startAgain;
           thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.result;
-
           thisPathfinder.dom.routeFull.innerHTML = finder.selectedSquares.length;
           thisPathfinder.dom.routeLongest.innerHTML = finder.longestPath != undefined ? finder.longestPath.length - 1 : 'unknown';
           thisPathfinder.dom.routeShortest.innerHTML = finder.shortestPath != undefined ? finder.shortestPath.length - 1 : 'unknown';
           thisPathfinder.dom.modal.classList.add(classNames.pathfinder.modal.active);
-          
 
         } else {
           thisPathfinder.dom.error.innerHTML = strings.pathfinder.errors.markStartFinish;
@@ -213,10 +185,10 @@ class Pathfinder {
         thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.finishDrawing;
         thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.drawRoutes;
         break;
-
       }
     });
 
+    // modal actions
     thisPathfinder.dom.modalCloseButton.addEventListener('click', function() {
       thisPathfinder.dom.modal.classList.remove(classNames.pathfinder.modal.active);
     });
@@ -312,6 +284,20 @@ class Pathfinder {
     thisPathfinder.initMatrix();
     thisPathfinder.startSquare = false;
     thisPathfinder.finishSquare = false;
+  }
+
+  fillAll(decreaseBy) {
+    const thisPathfinder = this;
+
+    thisPathfinder.resetGrid();
+
+    for (let x = 0; x <= settings.pathfinder.maxX - decreaseBy; x++) {
+
+      for (let y = 0; y <= settings.pathfinder.maxY - decreaseBy; y++) {
+        thisPathfinder.matrix[x][y].selected = true;
+        document.getElementById(settings.pathfinder.cellIdPrefix + x + '-' + y).classList.add(classNames.pathfinder.selected);
+      }
+    }
   }
 }
 
