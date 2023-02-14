@@ -106,10 +106,12 @@ class Pathfinder {
             if (thisPathfinder.canUnselectSquare(clickedSquare)) {
               clickedSquare.selected = false;
               cell.classList.remove(classNames.pathfinder.selected);
+              thisPathfinder.setPossibleSquaresStyle();
             }
           } else if (thisPathfinder.canSelectSquare(clickedSquare)) {
             clickedSquare.selected = true;
             cell.classList.add(classNames.pathfinder.selected);
+            thisPathfinder.setPossibleSquaresStyle();
           }
         } else if (thisPathfinder.currentMode == thisPathfinder.modes.markStartStop) {
           if (clickedSquare.selected) {
@@ -192,12 +194,32 @@ class Pathfinder {
     return thisPathfinder.matrix[x][y];
   }
 
-  setPossibleSquaresStyle(clickedSquare) {
+  setPossibleSquaresStyle() {
     const thisPathfinder = this;
 
+    thisPathfinder.removePossibleSquaresStyle();
     const finder = new Finder(thisPathfinder.matrix);
-    
 
+    for (const square of finder.selectedSquares) {
+      const neighbours = square.getLineNeighbours();
+
+      for (const neighbour of neighbours) {
+        if (!finder.matrix[neighbour.x][neighbour.y].selected) {
+          const cell = document.getElementById(settings.pathfinder.cellIdPrefix + neighbour.x + '-' + neighbour.y);
+          cell.classList.add(classNames.pathfinder.possibleNextSquare);
+        }
+      }
+    }
+  }
+
+  removePossibleSquaresStyle() {
+    const thisPathfinder = this;
+
+    for (const row of thisPathfinder.dom.table.children) {
+      for (const cell of row.children) {
+        cell.classList.remove(classNames.pathfinder.possibleNextSquare);
+      }
+    }
   }
 
   canSelectSquare(clickedSquare) {
