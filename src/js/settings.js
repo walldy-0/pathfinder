@@ -29,6 +29,7 @@ export const settings = {
     maxX: 9, // start from 0
     maxY: 9, // start from 0
     cellIdPrefix: 'cell-',
+    maxSearchExecutionTime: 200, // in miliseconds
   },
 };
 

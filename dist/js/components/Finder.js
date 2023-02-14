@@ -8,6 +8,7 @@ class Finder {
     thisFinder.selectedSquares = thisFinder.getSelectedSquares();
 
     thisFinder.shortestPath = undefined;
+    thisFinder.longestPath = undefined;
     thisFinder.abortExecution = false;
   }
 
@@ -90,6 +91,7 @@ class Finder {
     const thisFinder = this;
 
     thisFinder.startTime = Date.now();
+    thisFinder.abortExecution = false;
     thisFinder.findShortest(startSquare, finishSquare);
   }
 
@@ -158,17 +160,26 @@ class Finder {
     const thisFinder = this;
     thisFinder.setAllSelectedSquaresUnvisited();
     thisFinder.path = [];
-    thisFinder.longestPath = [];
 
+    thisFinder.startTime = Date.now();
+    thisFinder.abortExecution = false;
+    thisFinder.longestPath = [];
+    
     thisFinder.findPath(startSquare, finishSquare);
 
-    return thisFinder.longestPath;
+    if (thisFinder.abortExecution) {
+      thisFinder.longestPath = undefined;
+    }
+
+    //return thisFinder.longestPath;
   }
 
   findPath(startSquare, finishSquare) {
     const thisFinder = this;
 
-    if (!startSquare.visited) {
+    thisFinder.abortExecution = Date.now() - thisFinder.startTime > settings.pathfinder.maxSearchExecutionTime;
+
+    if (!startSquare.visited && !thisFinder.abortExecution) {
 
       startSquare.visited = true;
       thisFinder.path.push(startSquare);

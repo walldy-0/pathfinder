@@ -22,7 +22,7 @@ class Pathfinder {
 
     thisPathfinder.currentMode = thisPathfinder.modes.drawing;
 
-    //this.fillAll(1);
+    this.fillAll(0);
   }
 
   fillAll(decreaseBy) {
@@ -177,11 +177,14 @@ class Pathfinder {
             thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
             thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
           );
-          
-          const shortestPath = finder.shortestPath;
 
-          if (shortestPath != undefined) {
-            for (const square of shortestPath) {
+          finder.findLongestPath(
+            thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
+            thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
+          );
+          
+          if (finder.shortestPath != undefined) {
+            for (const square of finder.shortestPath) {
               const cell = document.getElementById(settings.pathfinder.cellIdPrefix + square.x + '-' + square.y);
               
               cell.setAttribute('class', classNames.pathfinder.markedPath);
@@ -193,8 +196,8 @@ class Pathfinder {
           thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.result;
 
           thisPathfinder.dom.routeFull.innerHTML = finder.selectedSquares.length;
-          //thisPathfinder.dom.routeLongest.innerHTML = longestPath.length - 1;
-          thisPathfinder.dom.routeShortest.innerHTML = shortestPath != undefined ? shortestPath.length - 1 : 'unknown';
+          thisPathfinder.dom.routeLongest.innerHTML = finder.longestPath != undefined ? finder.longestPath.length - 1 : 'unknown';
+          thisPathfinder.dom.routeShortest.innerHTML = finder.shortestPath != undefined ? finder.shortestPath.length - 1 : 'unknown';
           thisPathfinder.dom.modal.classList.add(classNames.pathfinder.modal.active);
           
 
