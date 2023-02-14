@@ -12,6 +12,7 @@ $image-section-2-height: 385px;
   }
 
   .text-wrapper {
+    display: inline-block;
     transform: translate(0.5 * $image-section-1-width, -0.3 * $image-section-1-height);
   }
 }

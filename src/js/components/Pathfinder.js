@@ -22,17 +22,17 @@ class Pathfinder {
 
     thisPathfinder.currentMode = thisPathfinder.modes.drawing;
 
-    //this.fillAll();
+    //this.fillAll(1);
   }
 
-  fillAll() {
+  fillAll(decreaseBy) {
     const thisPathfinder = this;
 
     this.resetGrid();
 
-    for (let x = 0; x <= settings.pathfinder.maxX - 3; x++) {
+    for (let x = 0; x <= settings.pathfinder.maxX - decreaseBy; x++) {
 
-      for (let y = 0; y <= settings.pathfinder.maxY - 3; y++) {
+      for (let y = 0; y <= settings.pathfinder.maxY - decreaseBy; y++) {
         thisPathfinder.matrix[x][y].selected = true;
         document.getElementById('cell-' + x + '-' + y).classList.add(classNames.pathfinder.selected);
       }
@@ -66,6 +66,11 @@ class Pathfinder {
     thisPathfinder.dom.error = wrapper.querySelector(select.pathfinder.error);
     thisPathfinder.dom.error.innerHTML = '&nbsp;';
     thisPathfinder.dom.gridWrapper = wrapper.querySelector(select.pathfinder.gridWrapper);
+    thisPathfinder.dom.modal = document.querySelector(select.containerOf.modal);
+    thisPathfinder.dom.modalCloseButton = document.querySelector(select.modal.modalCloseButton);
+    thisPathfinder.dom.routeFull = document.querySelector(select.modal.routeFull);
+    thisPathfinder.dom.routeLongest = document.querySelector(select.modal.routeLongest);
+    thisPathfinder.dom.routeShortest = document.querySelector(select.modal.routeShortest);
   }
 
   createGridElement() {
@@ -106,12 +111,12 @@ class Pathfinder {
             if (thisPathfinder.canUnselectSquare(clickedSquare)) {
               clickedSquare.selected = false;
               cell.classList.remove(classNames.pathfinder.selected);
-              thisPathfinder.setPossibleSquaresStyle();
+              thisPathfinder.setHints();
             }
           } else if (thisPathfinder.canSelectSquare(clickedSquare)) {
             clickedSquare.selected = true;
             cell.classList.add(classNames.pathfinder.selected);
-            thisPathfinder.setPossibleSquaresStyle();
+            thisPathfinder.setHints();
           }
         } else if (thisPathfinder.currentMode == thisPathfinder.modes.markStartStop) {
           if (clickedSquare.selected) {
@@ -141,32 +146,58 @@ class Pathfinder {
       event.preventDefault();
 
       thisPathfinder.dom.error.innerHTML = '&nbsp;';
+      const finder = new Finder(thisPathfinder.matrix);
 
       switch (thisPathfinder.currentMode) {
       
       case thisPathfinder.modes.drawing:
-        thisPathfinder.currentMode = thisPathfinder.modes.markStartStop;
-        thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.compute;
-        thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.markStartFinish;
+        if (finder.selectedSquares.length >= 2) {
+          thisPathfinder.currentMode = thisPathfinder.modes.markStartStop;
+          thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.compute;
+          thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.markStartFinish;
+          thisPathfinder.removeHints();
+        } else {
+          thisPathfinder.dom.error.innerHTML = strings.pathfinder.errors.selectTwoSquares;
+        }
         break;
 
       case thisPathfinder.modes.markStartStop:
         if (thisPathfinder.startSquare && thisPathfinder.finishSquare) {
-          const finder = new Finder(thisPathfinder.matrix);
-          const shortestPath = finder.findShortestPath(
+          /*const shortestPath = finder.findShortestPath(
+            thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
+            thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
+          );*/
+
+          /*const longestPath = finder.findLongestPath(
+            thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
+            thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
+          );*/
+          
+          finder.findShortestPath(
             thisPathfinder.matrix[thisPathfinder.startSquare.x][thisPathfinder.startSquare.y],
             thisPathfinder.matrix[thisPathfinder.finishSquare.x][thisPathfinder.finishSquare.y]
           );
           
-          for (const square of shortestPath) {
-            const cell = document.getElementById(settings.pathfinder.cellIdPrefix + square.x + '-' + square.y);
-            
-            cell.setAttribute('class', classNames.pathfinder.markedPath);
+          const shortestPath = finder.shortestPath;
+
+          if (shortestPath != undefined) {
+            for (const square of shortestPath) {
+              const cell = document.getElementById(settings.pathfinder.cellIdPrefix + square.x + '-' + square.y);
+              
+              cell.setAttribute('class', classNames.pathfinder.markedPath);
+            }
           }
           
           thisPathfinder.currentMode = thisPathfinder.modes.compute;
           thisPathfinder.dom.button.innerHTML = strings.pathfinder.buttons.startAgain;
           thisPathfinder.dom.message.innerHTML = strings.pathfinder.messages.result;
+
+          thisPathfinder.dom.routeFull.innerHTML = finder.selectedSquares.length;
+          //thisPathfinder.dom.routeLongest.innerHTML = longestPath.length - 1;
+          thisPathfinder.dom.routeShortest.innerHTML = shortestPath != undefined ? shortestPath.length - 1 : 'unknown';
+          thisPathfinder.dom.modal.classList.add(classNames.pathfinder.modal.active);
+          
+
         } else {
           thisPathfinder.dom.error.innerHTML = strings.pathfinder.errors.markStartFinish;
         }
@@ -182,6 +213,10 @@ class Pathfinder {
 
       }
     });
+
+    thisPathfinder.dom.modalCloseButton.addEventListener('click', function() {
+      thisPathfinder.dom.modal.classList.remove(classNames.pathfinder.modal.active);
+    });
   }
 
   getSquareFromTableCell(cell) {
@@ -194,10 +229,10 @@ class Pathfinder {
     return thisPathfinder.matrix[x][y];
   }
 
-  setPossibleSquaresStyle() {
+  setHints() {
     const thisPathfinder = this;
 
-    thisPathfinder.removePossibleSquaresStyle();
+    thisPathfinder.removeHints();
     const finder = new Finder(thisPathfinder.matrix);
 
     for (const square of finder.selectedSquares) {
@@ -212,7 +247,7 @@ class Pathfinder {
     }
   }
 
-  removePossibleSquaresStyle() {
+  removeHints() {
     const thisPathfinder = this;
 
     for (const row of thisPathfinder.dom.table.children) {

@@ -2,6 +2,7 @@ export const select = {
   containerOf: {
     pathfinder: '.pathfinder-container',
     pages: '.content',
+    modal: '.modal',
   },
 
   pathfinder: {
@@ -13,6 +14,13 @@ export const select = {
 
   menu: {
     links: '.menu a',
+  },
+
+  modal: {
+    routeFull: '.full-route-value',
+    routeLongest: '.longest-route-value',
+    routeShortest: '.shortest-route-value',
+    modalCloseButton: '.modal-close-button',
   },
 };
 
@@ -31,6 +39,9 @@ export const classNames = {
     finish: 'finish',
     markedPath: 'shortest-path',
     possibleNextSquare: 'possible-next-square',
+    modal: {
+      active: 'active',
+    },
   },
 
   menu: {
@@ -60,6 +71,7 @@ export const strings = {
       cantSelectField: 'You can\'t select this field',
       cantUnselectField: 'You can\'t unselect this field',
       markStartFinish: 'Pick start and finish fields',
+      selectTwoSquares: 'Select at least two squares',
     },
 
     text: {

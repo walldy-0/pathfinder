@@ -38,8 +38,13 @@ table {
 }
 
 .possible-next-square {
-  background-color: $color-possible-mark;
+  background-color: $color-hint;
   opacity: 0.15;
+
+  &:hover {
+    //background-color: green;
+    opacity: 1;
+  }
 }
 
 .button-wrapper {

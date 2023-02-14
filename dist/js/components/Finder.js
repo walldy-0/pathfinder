@@ -1,9 +1,14 @@
+import { settings } from '../settings.js';
+
 class Finder {
   constructor(matrix) {
     const thisFinder = this;
 
     thisFinder.matrix = matrix;
     thisFinder.selectedSquares = thisFinder.getSelectedSquares();
+
+    thisFinder.shortestPath = undefined;
+    thisFinder.abortExecution = false;
   }
 
   getSelectedSquares() {
@@ -25,8 +30,12 @@ class Finder {
   checkAllSquaresConnected() {
     const thisFinder = this;
 
+    if (thisFinder.selectedSquares.length <= 1) {
+      return true;
+    }
+
     thisFinder.setAllSelectedSquaresUnvisited();
-    thisFinder.dfs(thisFinder.selectedSquares[0]);
+    thisFinder.checkConnections(thisFinder.selectedSquares[0]);
 
     let connected = true;
 
@@ -40,7 +49,7 @@ class Finder {
     return connected;
   }
 
-  dfs(square) {
+  checkConnections(square) {
     const thisFinder = this;
 
     square.visited = true;
@@ -48,7 +57,7 @@ class Finder {
     const neighbours = thisFinder.getSelectedNeighboursOfSquare(square);
     for (const neighbour of neighbours) {
       if (!neighbour.visited) {
-        thisFinder.dfs(neighbour);
+        thisFinder.checkConnections(neighbour);
       }
     }
   }
@@ -79,9 +88,16 @@ class Finder {
 
   findShortestPath(startSquare, finishSquare) {
     const thisFinder = this;
+
+    thisFinder.startTime = Date.now();
+    thisFinder.findShortest(startSquare, finishSquare);
+  }
+
+  findShortest(startSquare, finishSquare) {
+    const thisFinder = this;
     thisFinder.setAllSelectedSquaresUnvisited();
 
-    startSquare.way = 0;
+    startSquare.distance = 0;
     let queue = [startSquare];
 
     do {
@@ -94,33 +110,48 @@ class Finder {
         if (!neighbour.visited) {
           queue.push(neighbour);
 
-          if (neighbour.way > currentSquare.way) {
-            neighbour.way = currentSquare.way + 1;
+          if (neighbour.distance > currentSquare.distance) {
+            neighbour.distance = currentSquare.distance + 1;
             neighbour.parent = currentSquare;
           }
         }
       }
-    } while (queue.length > 0);
 
-    const pathInverted = [finishSquare];
-    let hasParent = finishSquare.parent != undefined;
+      thisFinder.abortExecution = Date.now() - thisFinder.startTime > settings.pathfinder.maxSearchExecutionTime; 
 
-    while (hasParent) {
-      const parent = pathInverted[pathInverted.length -1].parent;
-      hasParent = parent != undefined;
+    } while (queue.length > 0 && !thisFinder.abortExecution);
 
-      if (hasParent) {
-        pathInverted.push(parent);
+    //console.log('executionTime', Date.now() - thisFinder.startTime);
+
+    if (!thisFinder.abortExecution) {
+      const pathInverted = [finishSquare];
+      let hasParent = finishSquare.parent != undefined;
+
+      while (hasParent) {
+        const parent = pathInverted[pathInverted.length -1].parent;
+        hasParent = parent != undefined;
+
+        if (hasParent) {
+          pathInverted.push(parent);
+        }
       }
+
+      const path = [];
+      for (let i = pathInverted.length - 1; i >= 0; i--) {
+        path.push(pathInverted[i]);
+      }
+
+      thisFinder.shortestPath = path;
     }
 
+    
+    /*
     const path = [];
     for (let i = pathInverted.length - 1; i >= 0; i--) {
       path.push(pathInverted[i]);
     }
 
-    console.log(path);
-    return path;
+    return path;*/
   }
 
   findLongestPath(startSquare, finishSquare) {
@@ -134,35 +165,34 @@ class Finder {
     return thisFinder.longestPath;
   }
 
-  findPath(u, v) {
+  findPath(startSquare, finishSquare) {
     const thisFinder = this;
 
-    if (u.visited) {
-      return;
-    }
+    if (!startSquare.visited) {
 
-    u.visited = true;
-    thisFinder.path.push(u);
+      startSquare.visited = true;
+      thisFinder.path.push(startSquare);
 
-    if (u == v) {
-      if (thisFinder.path.length > thisFinder.longestPath.length) {
-        thisFinder.longestPath = thisFinder.path.slice();
+      if (startSquare == finishSquare) {
+        if (thisFinder.path.length > thisFinder.longestPath.length) {
+          thisFinder.longestPath = thisFinder.path.slice();
+        }
+
+        startSquare.visited = false;
+        thisFinder.path.splice(thisFinder.path.length - 1, 1);
+
+        return;
       }
 
-      u.visited = false;
+      const neighbours = thisFinder.getSelectedNeighboursOfSquare(startSquare);
+
+      for (const neighbour of neighbours) {
+        thisFinder.findPath(neighbour, finishSquare);
+      }
+
+      startSquare.visited = false;
       thisFinder.path.splice(thisFinder.path.length - 1, 1);
-
-      return;
     }
-
-    const neighbours = thisFinder.getSelectedNeighboursOfSquare(u);
-
-    for (const neighbour of neighbours) {
-      this.findPath(neighbour, v);
-    }
-
-    u.visited = false;
-    thisFinder.path.splice(thisFinder.path.length - 1, 1);
   }
 }
 

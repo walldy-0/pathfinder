@@ -9,7 +9,7 @@ class Square {
     thisSquare.selected = false;
     thisSquare.visited = false;
     thisSquare.parent = undefined;
-    thisSquare.way = Number.MAX_SAFE_INTEGER;
+    thisSquare.distance = Number.MAX_SAFE_INTEGER;
   }
 
   isLineNeighbourOf(otherSquare) {
