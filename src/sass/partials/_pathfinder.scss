@@ -37,6 +37,11 @@ table {
   background-color: $color-shortest-path;
 }
 
+.possible-next-square {
+  background-color: $color-possible-mark;
+  opacity: 0.5;
+}
+
 .button-wrapper {
   height: 100px;
   text-align: center;

@@ -80,7 +80,6 @@ class Pathfinder {
 
       for (let x = 0; x <= settings.pathfinder.maxX; x++) {
         const cell = document.createElement('td');
-        //cell.innerHTML = x + '-' + y;
 
         cell.setAttribute('id', settings.pathfinder.cellIdPrefix + x + '-' + y);
         row.appendChild(cell);
@@ -125,11 +124,11 @@ class Pathfinder {
             } else if (!thisPathfinder.startSquare) {
               thisPathfinder.startSquare = new Square(clickedSquare.x, clickedSquare.y);
               cell.classList.add(classNames.pathfinder.start);
-              cell.innerHTML = 'Start';
+              cell.innerHTML = strings.pathfinder.text.startSquare;
             } else if (!thisPathfinder.finishSquare) {
               thisPathfinder.finishSquare = new Square(clickedSquare.x, clickedSquare.y);
               cell.classList.add(classNames.pathfinder.finish);
-              cell.innerHTML = 'Finish';
+              cell.innerHTML = strings.pathfinder.text.finishSquare;
             }
           }
         }
@@ -191,6 +190,14 @@ class Pathfinder {
     const y = parseInt(coords[1]);
 
     return thisPathfinder.matrix[x][y];
+  }
+
+  setPossibleSquaresStyle(clickedSquare) {
+    const thisPathfinder = this;
+
+    const finder = new Finder(thisPathfinder.matrix);
+    
+
   }
 
   canSelectSquare(clickedSquare) {

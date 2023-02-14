@@ -30,6 +30,7 @@ export const classNames = {
     start: 'start',
     finish: 'finish',
     markedPath: 'shortest-path',
+    possibleNextSquare: 'possible-next-square',
   },
 
   menu: {
@@ -59,6 +60,11 @@ export const strings = {
       cantSelectField: 'You can\'t select this field',
       cantUnselectField: 'You can\'t unselect this field',
       markStartFinish: 'Pick start and finish fields',
-    }
+    },
+
+    text: {
+      startSquare: 'Start',
+      finishSquare: 'Finish',
+    },
   },
 };
