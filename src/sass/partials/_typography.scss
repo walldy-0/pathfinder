@@ -3,28 +3,28 @@ h1, h2, h3 {
 }
 
 h1 {
-  font-size: 4 * $base-size;
+  font-size: 48px;
   font-weight: 900;
 }
 
 h2 {
-  font-size: 2.33 * $base-size;
+  font-size: 28px;
   font-weight: 700;
   letter-spacing: 0.1em;
 }
 
 h3 {
-  font-size: 1.33 * $base-size;
+  font-size: 16px;
   font-weight: 600;
 }
 
 h4 {
-  font-size: 1.5 * $base-size;
+  font-size: 18px;
   font-weight: 400;
   letter-spacing: 0.1em;
 }
 
 h5 {
-  font-size: $base-size;
+  font-size: 12px;
   font-weight: 400;
 }

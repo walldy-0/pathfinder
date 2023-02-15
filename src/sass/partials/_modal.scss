@@ -9,6 +9,7 @@
   display: none;
 }
 
+
 .modal-container {
   .active {
     display: block;
@@ -41,17 +42,6 @@
 
 .modal-content {
   color: $color-dark;
-  margin-top: 50px;
-
-  h1 {
-    font-size: 36px;
-    font-weight: 900;
-    letter-spacing: 0.15em;
-    text-align: center;
-  }
-}
-
-.modal-summary {
   display: inline-block;
   position: absolute;
   top: 50%;
@@ -59,6 +49,14 @@
   transform: translate(-50%, -50%);
   font-weight: 600;
   letter-spacing: 0.15em;
+
+  h1 {
+    font-size: 36px;
+    font-weight: 900;
+    letter-spacing: 0.15em;
+    text-align: center;
+    margin-bottom: 30px;
+  }
 
   P {
     font-size: 24px;
