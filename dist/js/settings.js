@@ -2,7 +2,6 @@ export const select = {
   containerOf: {
     pathfinder: '.pathfinder-container',
     pages: '.content',
-    modal: '.modal',
   },
 
   pathfinder: {
@@ -17,6 +16,7 @@ export const select = {
   },
 
   modal: {
+    container: '.modal',
     routeFull: '.full-route-value',
     routeLongest: '.longest-route-value',
     routeShortest: '.shortest-route-value',

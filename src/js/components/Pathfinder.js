@@ -48,7 +48,7 @@ class Pathfinder {
     thisPathfinder.dom.error = wrapper.querySelector(select.pathfinder.error);
     thisPathfinder.dom.error.innerHTML = '&nbsp;';
     thisPathfinder.dom.gridWrapper = wrapper.querySelector(select.pathfinder.gridWrapper);
-    thisPathfinder.dom.modal = document.querySelector(select.containerOf.modal);
+    thisPathfinder.dom.modal = document.querySelector(select.modal.container);
     thisPathfinder.dom.modalCloseButton = document.querySelector(select.modal.modalCloseButton);
     thisPathfinder.dom.routeFull = document.querySelector(select.modal.routeFull);
     thisPathfinder.dom.routeLongest = document.querySelector(select.modal.routeLongest);
